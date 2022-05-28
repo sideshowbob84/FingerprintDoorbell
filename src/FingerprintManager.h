@@ -40,11 +40,11 @@ class FingerprintManager {
     String fingerList[201];
     int fingerCountOnSensor = 0;
     bool ignoreTouchRing = false; // set to true when the sensor is usually exposed to rain to avoid false ring events. Can also be set conditional by a rain sensor over MQTT
+    bool ringSilent = false; // adds ability to silent the bell via mqtt
     bool lastIgnoreTouchRing = false;
     
     void updateTouchState(bool touched);
     bool isRingTouched();
-    bool ringSilent();
     void loadFingerListFromPrefs();
     void disconnect();
     uint8_t writeNotepad(uint8_t pageNumber, const char *text, uint8_t length);
