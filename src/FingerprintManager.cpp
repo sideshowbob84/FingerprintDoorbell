@@ -437,6 +437,10 @@ void FingerprintManager::setRingSilent(bool state) {
   }
 }
 
+bool FingerprintManager::getRingSilent() {
+  return ringSilent;
+}
+
 bool FingerprintManager::isRingTouched() {
   if (digitalRead(touchRingPin) == LOW) // LOW = touched. Caution: touchSignal on this pin occour only once (at beginning of touching the ring, not every iteration if you keep your finger on the ring)
       return true;
