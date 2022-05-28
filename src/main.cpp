@@ -468,6 +468,14 @@ void mqttCallback(char* topic, byte* message, unsigned int length) {
       fingerManager.setIgnoreTouchRing(false);
     }
   }
+  else if (String(topic) == String(settingsManager.getAppSettings().mqttRootTopic) + "/ringSilent") {
+    if(messageTemp == "on"){
+      fingerManager.setRingSilent(true);
+    }
+    else if(messageTemp == "off"){
+      fingerManager.setRingSilent(false);
+    }
+  }
 
   #ifdef CUSTOM_GPIOS
     if (String(topic) == String(settingsManager.getAppSettings().mqttRootTopic) + "/customOutput1") {
@@ -509,6 +517,7 @@ void connectMqttClient() {
       Serial.println("connected");
       // Subscribe
       mqttClient.subscribe((settingsManager.getAppSettings().mqttRootTopic + "/ignoreTouchRing").c_str(), 1); // QoS = 1 (at least once)
+      mqttClient.subscribe((settingsManager.getAppSettings().mqttRootTopic + "/ringSilent").c_str(), 1); // QoS = 1 (at least once)
       #ifdef CUSTOM_GPIOS
         mqttClient.subscribe((settingsManager.getAppSettings().mqttRootTopic + "/customOutput1").c_str(), 1); // QoS = 1 (at least once)
         mqttClient.subscribe((settingsManager.getAppSettings().mqttRootTopic + "/customOutput2").c_str(), 1); // QoS = 1 (at least once)
