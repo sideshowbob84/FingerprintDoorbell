@@ -571,7 +571,9 @@ void doScan()
     case ScanResult::noMatchFound:
       notifyClients(String("No Match Found (Code ") + match.returnCode + ")");
       if (match.scanResult != lastMatch.scanResult) {
-        digitalWrite(doorbellOutputPin, HIGH);
+        if (fingerManager.getRingSilent() ) {
+          digitalWrite(doorbellOutputPin, HIGH);
+        }
         mqttClient.publish((String(mqttRootTopic) + "/ring").c_str(), "on");
         mqttClient.publish((String(mqttRootTopic) + "/matchId").c_str(), "-1");
         mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), "");
