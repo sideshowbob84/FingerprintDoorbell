@@ -44,6 +44,7 @@ class FingerprintManager {
     
     void updateTouchState(bool touched);
     bool isRingTouched();
+    bool ringSilent();
     void loadFingerListFromPrefs();
     void disconnect();
     uint8_t writeNotepad(uint8_t pageNumber, const char *text, uint8_t length);
