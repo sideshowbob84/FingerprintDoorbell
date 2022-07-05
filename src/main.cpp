@@ -461,19 +461,23 @@ void mqttCallback(char* topic, byte* message, unsigned int length) {
 
   // Check incomming message for interesting topics
   if (String(topic) == String(settingsManager.getAppSettings().mqttRootTopic) + "/ignoreTouchRing") {
-    if(messageTemp == "on"){
+    if(messageTemp == "ON"){
       fingerManager.setIgnoreTouchRing(true);
+      notifyClients("Touchring on.");
     }
-    else if(messageTemp == "off"){
+    else if(messageTemp == "OFF"){
       fingerManager.setIgnoreTouchRing(false);
+      notifyClients("Touchring off.");
     }
   }
   else if (String(topic) == String(settingsManager.getAppSettings().mqttRootTopic) + "/ringSilent") {
-    if(messageTemp == "on"){
+    if(messageTemp == "ON"){
       fingerManager.setRingSilent(true);
+      notifyClients("Klingel stumm.");
     }
-    else if(messageTemp == "off"){
+    else if(messageTemp == "OFF"){
       fingerManager.setRingSilent(false);
+      notifyClients("Klingel laut.");
     }
   }
 
@@ -547,7 +551,7 @@ void doScan()
       // standard case, occurs every iteration when no finger touchs the sensor
       if (match.scanResult != lastMatch.scanResult) {
         Serial.println("no finger");
-        mqttClient.publish((String(mqttRootTopic) + "/ring").c_str(), "off");
+        mqttClient.publish((String(mqttRootTopic) + "/ring").c_str(), "CLOSED");
         mqttClient.publish((String(mqttRootTopic) + "/matchId").c_str(), "-1");
         mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), "");
         mqttClient.publish((String(mqttRootTopic) + "/matchConfidence").c_str(), "-1");
@@ -557,7 +561,7 @@ void doScan()
       notifyClients( String("Match Found: ") + match.matchId + " - " + match.matchName  + " with confidence of " + match.matchConfidence );
       if (match.scanResult != lastMatch.scanResult) {
         if (checkPairingValid()) {
-          mqttClient.publish((String(mqttRootTopic) + "/ring").c_str(), "off");
+          mqttClient.publish((String(mqttRootTopic) + "/ring").c_str(), "CLOSED");
           mqttClient.publish((String(mqttRootTopic) + "/matchId").c_str(), String(match.matchId).c_str());
           mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), match.matchName.c_str());
           mqttClient.publish((String(mqttRootTopic) + "/matchConfidence").c_str(), String(match.matchConfidence).c_str());
@@ -571,15 +575,15 @@ void doScan()
     case ScanResult::noMatchFound:
       notifyClients(String("No Match Found (Code ") + match.returnCode + ")");
       if (match.scanResult != lastMatch.scanResult) {
-        if (fingerManager.getRingSilent() ) {
+        if (!fingerManager.getRingSilent() ) {
           digitalWrite(doorbellOutputPin, HIGH);
         }
-        mqttClient.publish((String(mqttRootTopic) + "/ring").c_str(), "on");
+        mqttClient.publish((String(mqttRootTopic) + "/ring").c_str(), "OPEN");
         mqttClient.publish((String(mqttRootTopic) + "/matchId").c_str(), "-1");
         mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), "");
         mqttClient.publish((String(mqttRootTopic) + "/matchConfidence").c_str(), "-1");
         Serial.println("MQTT message sent: ring the bell!");
-        delay(1000);
+        delay(100);
         digitalWrite(doorbellOutputPin, LOW); 
       } else {
         delay(1000); // wait some time before next scan to let the LED blink
